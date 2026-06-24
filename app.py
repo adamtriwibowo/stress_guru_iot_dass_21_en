@@ -13,7 +13,8 @@ import json
 app = Flask(__name__)
 CORS(app)
 
-DATABASE = 'stress_test.db'
+# Use /tmp on Vercel (writable), local path otherwise
+DATABASE = '/tmp/stress_test.db' if os.environ.get('VERCEL') else 'stress_test.db'
 
 # Initialize database
 def init_db():
@@ -271,7 +272,9 @@ def receive_sensor_data():
         "timestamp": datetime.now().isoformat()
     })
 
+# Initialize DB at module level so it runs on Vercel cold start too
+init_db()
+
 if __name__ == '__main__':
-    init_db()
     print("🚀 Server running at http://localhost:5000")
     app.run(debug=True, port=5000)
